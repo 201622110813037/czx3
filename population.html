@@ -45,7 +45,7 @@
               defaultLabel: "No data",
               defaultSymbol: {
                 type: "simple-fill",
-                color: "#fcedcd",
+                color: "#C7C7C7",
                 outline: {
                   color: [255, 255, 255, 0.1],
                   width: 0.5
@@ -55,9 +55,12 @@
                 {
                   type: "color",
                   field: "pop2000",
+									legendOptions: {
+									  title: "population"
+									},
                   stops: [
-                    { value: 440000, color: "#D0D0CB" },
-                    { value: 91236854, color: "#4F6704" }
+                    { value: 440000, color: "#FFDEAD" },
+                    { value: 91236854, color: "#FF3030" }
                   ]
                 }
               ]
@@ -65,6 +68,7 @@
 
         const geojsonLayer = new GeoJSONLayer({
           url: url,
+					title: "China's population of 2000 year",
 					renderer: renderer
         });
 
