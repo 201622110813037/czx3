@@ -1,0 +1,41 @@
+<html>
+<head>
+    <style>
+        div{
+            width: 550px;
+            height: 550px;
+            background-color: aqua;
+        }
+        img{
+            position:absolute;
+           
+        }
+    
+    </style>
+    <script>
+        
+        
+    function clipImage()
+{
+    console.log(event.clientX);
+    document.getElementById("abc").style.clip="rect(0px,"+event.clientX +"px,500px,0px)";
+    
+    
+    
+}
+    
+    
+    </script>
+    </head>
+
+<body>
+    
+    <div onmousemove="clipImage()"> 
+        
+    <img id="abcd" src="1540@2x.png" \>
+    <img id="abc" src="57202@2x.png" \>
+        
+    </div>
+    
+</body>
+</html>
