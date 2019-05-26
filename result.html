@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Data-driven extrusion - 4.11</title>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.11/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.11/"></script>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/SceneView",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/Legend",
+		"esri/layers/GeoJSONLayer"
+      ], function(Map, SceneView, FeatureLayer, Legend, GeoJSONLayer) {
+        // limit visualization to southeast U.S. counties
+
+        /*****************************************************************
+         * In this case we set two visual variables on the renderer. Since
+         * we're defining both size and color based on data values, there's
+         * no need to specify defaults in the `symbol` property of the
+         * renderer. In 3D it is easier to visually perceive size differences
+         * when they are combined with color. Therefore we set up both a
+         * size and a color visual variable based on the values of the same
+         * field.
+         *
+         * Notice that the data value ramps for each is slightly different.
+         * Color allows us to see the spatial trend in a tight range, whereas
+         * size can be used to observe nuances between features of the same
+         * color.
+         *****************************************************************/
+		const url =
+		   "https://201622110813037.github.io/czx3/wuhan7qu.json";
+
+        var renderer = {
+          type: "simple", // autocasts as new SimpleRenderer()
+          symbol: {
+            type: "polygon-3d", // autocasts as new PolygonSymbol3D()
+            symbolLayers: [
+              {
+                type: "extrude" // autocasts as new ExtrudeSymbol3DLayer()
+              }
+            ]
+          },
+          visualVariables: [
+            {
+              type: "size",
+              field: "2017",
+              stops: [
+                {
+                  value: 0.300257,
+                  size: 1000,
+                  label: "0.300257"
+                },
+                {
+                  value: 0.821045,
+                  size: 3000,
+                  label: "0.821045"
+                }
+              ]
+            },
+            {
+              type: "color",
+              field: "2017",
+              legendOptions: {
+                title: "颜色和高度分别代表2017年的土地利用集约度，颜色越深高度越高，集约度越大"
+              },
+              stops: [
+                {
+                  value: 0.300257,
+                  color: "#FFFCD4",
+                  label: "0.300257"
+                },
+                {
+                  value: 0.821045,
+                  color: [153, 83, 41],
+                  label: "0.821045"
+                }
+              ]
+            }
+          ]
+        };
+
+        var povLayer = new GeoJSONLayer({
+          url:url,
+          renderer: renderer,
+          title: "Population living in poverty by county",
+        });
+
+        var map = new Map({
+          basemap: "gray",
+          layers: [povLayer]
+        });
+
+        var view = new SceneView({
+          container: "viewDiv",
+          map: map,
+          center: [114.3, 30.5],
+          zoom: 10,
+        });
+
+        var legend = new Legend({
+          view: view
+        });
+
+        view.ui.add(legend, "bottom-right");
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
