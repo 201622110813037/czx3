@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+	<link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
+	<script src="https://js.arcgis.com/4.15/"></script>
+    <title></title>
+    <style>
+      html, body, #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+  <script>
+	var searchWidget,csvLayer;
+    require([
+		"esri/Map",
+        "esri/views/MapView",
+		"esri/layers/GeoJSONLayer",
+		"esri/widgets/Search",
+		"esri/views/SceneView",
+		"esri/layers/CSVLayer",
+		], function(Map, MapView, GeoJSONLayer, Search, SceneView, CSVLayer) {
+  
+		var map = new Map({
+			basemap: "topo-vector",
+			ground: "world-elevation"  // show elevation
+		});
+		
+		var view = new SceneView({
+		    container: "viewDiv",
+		    map: map,
+		    camera: {
+		        position: {  // observation point
+					x: 116,
+					y: 39,
+					z: 250000 // altitude in meters
+		        },
+		        tilt: 65  // perspective in degrees
+		    }
+		});
+  
+			//定义一个景点的popupTemplate
+			var template = {
+				// autocasts as new PopupTemplate()
+				title: "中国五A级风景名胜之{name}",
+				content: [{
+					// It is also possible to set the fieldInfos outside of the content
+					// directly in the popupTemplate. If no fieldInfos is specifically set
+					// in the content, it defaults to whatever may be set within the popupTemplate.
+					type: "fields",
+					fieldInfos: [{
+							fieldName: "name",
+							label: "景区名称",
+							format: {
+								digitSeparator: true,
+								places: 0
+							}
+						},
+						{
+							fieldName: "wd",
+							label: "纬度",
+							format: {
+								digitSeparator: true,
+								places: 0
+							}
+						},
+						{
+							fieldName: "jd",
+							label: "经度",
+							format: {
+								digitSeparator: true,
+								places: 0
+							}
+						}
+					]
+				}]
+			};
+			pointRenderer = {
+				type: "simple", // autocasts as new SimpleRenderer()
+				symbol: {
+					type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+					size: 6,
+					color: [255, 0, 0],
+					outline: null
+				}
+			};
+
+			//定义一个csvLayer作为5A级景点的点图层
+			var url = "https://201622110813037.github.io/china/point2.csv";
+			csvLayer = new CSVLayer({
+				url: url,
+				latitudeField: "wd", //纬度
+				longitudeField: "jd", //经度
+				popupTemplate: template,
+				renderer: pointRenderer,
+				/* labelingInfo: [trailheadsLabels] */
+			});
+			
+			map.add(csvLayer);
+		
+			//定义一个搜索控件
+			searchWidget = new Search({
+				view: view,
+				allPlaceholder: "故宫博物院，选择查询图层",
+				sources: [{
+					layer: csvLayer,
+					searchFields: ["name"],
+					displayField: "name",
+					/* exactMatch: false, */
+					outFields: ["name", "wd", "jd"],
+					name: "中国5A级景区图层",
+					placeholder: "故宫博物院，选择查询图层"
+				}]
+			});
+		
+		view.ui.add(searchWidget, {
+			position: "top-right"
+		});
+		
+
+		
+    });
+    </script>
+</html>
